@@ -19,7 +19,6 @@ class GoogleMapsPlacesService {
       for (var item in data) {
         places.add(PlaceAutocompleteModel.fromJson(item));
       }
-
       return places;
     } else {
       throw Exception('Failed to load predictions');

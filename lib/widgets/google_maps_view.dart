@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:route_tracker/models/place_autocomplete_model/place_autocomplete_model.dart';
+import 'package:route_tracker/utils/google_maps_places_service.dart';
 import 'package:route_tracker/utils/location_service.dart';
+import 'package:route_tracker/widgets/custom_list_view.dart';
+import 'package:route_tracker/widgets/custom_text_field.dart';
 
 class GoogleMapsView extends StatefulWidget {
   const GoogleMapsView({super.key});
@@ -13,26 +17,71 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
   late CameraPosition initialCameraPosition;
   late LocationService locationService;
   late GoogleMapController googleMapController;
+  late TextEditingController textEditingController;
+  late GoogleMapsPlacesService googleMapsPlacesService;
+  List<PlaceAutocompleteModel> places = [];
   Set<Marker> markers = {};
 
   @override
   void initState() {
     initialCameraPosition = CameraPosition(target: LatLng(0, 0));
     locationService = LocationService();
-
+    textEditingController = TextEditingController();
+    googleMapsPlacesService = GoogleMapsPlacesService();
+    fetchPredection();
     super.initState();
+  }
+
+  void fetchPredection() {
+    textEditingController.addListener(() async {
+      final input = textEditingController.text.trim();
+
+      if (input.isEmpty) {
+        places.clear();
+        setState(() {});
+        return;
+      }
+
+      var result = await googleMapsPlacesService.getPredictions(input: input);
+      places
+        ..clear()
+        ..addAll(result);
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      onMapCreated: (controller) {
-        googleMapController = controller;
-        updateCurrentLocation();
-      },
-      initialCameraPosition: initialCameraPosition,
-      zoomControlsEnabled: false,
-      markers: markers,
+    return Stack(
+      children: [
+        GoogleMap(
+          onMapCreated: (controller) {
+            googleMapController = controller;
+            updateCurrentLocation();
+          },
+          initialCameraPosition: initialCameraPosition,
+          zoomControlsEnabled: false,
+          markers: markers,
+        ),
+        Positioned(
+          top: 16,
+          left: 16,
+          right: 16,
+          child: Column(
+            spacing: 10,
+            children: [
+              CustomTextField(textEditingController: textEditingController),
+              CustomListView(places: places),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
