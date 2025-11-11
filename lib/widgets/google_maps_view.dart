@@ -44,12 +44,12 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
       googleMapController.animateCamera(
         CameraUpdate.newCameraPosition(myCurrentCameraPosition),
       );
-    } on LocationPermissionException catch (e) {
+    } on LocationPermissionException {
       // TODO
-    } on LocationPermissionException catch (e) {
+    } on LocationPermissionException {
       // TODO
     } catch (e) {
-      //TODO
+      // TODO
     }
   }
 }
