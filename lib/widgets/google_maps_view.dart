@@ -13,12 +13,13 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
   late CameraPosition initialCameraPosition;
   late LocationService locationService;
   late GoogleMapController googleMapController;
+  Set<Marker> markers = {};
 
   @override
   void initState() {
     initialCameraPosition = CameraPosition(target: LatLng(0, 0));
     locationService = LocationService();
-    // updateCurrentLocation();
+
     super.initState();
   }
 
@@ -31,19 +32,30 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
       },
       initialCameraPosition: initialCameraPosition,
       zoomControlsEnabled: false,
+      markers: markers,
     );
   }
 
   void updateCurrentLocation() async {
     try {
       var locationData = await locationService.getCurrentLocationData();
+      LatLng mycurrentPosition = LatLng(
+        locationData.latitude!,
+        locationData.longitude!,
+      );
+      Marker currentLocationMarker = Marker(
+        markerId: MarkerId("my_location"),
+        position: mycurrentPosition,
+      );
       CameraPosition myCurrentCameraPosition = CameraPosition(
-        target: LatLng(locationData.latitude!, locationData.longitude!),
-        zoom: 13,
+        target: mycurrentPosition,
+        zoom: 17,
       );
       googleMapController.animateCamera(
         CameraUpdate.newCameraPosition(myCurrentCameraPosition),
       );
+      markers.add(currentLocationMarker);
+      setState(() {});
     } on LocationPermissionException {
       // TODO
     } on LocationPermissionException {
