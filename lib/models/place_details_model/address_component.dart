@@ -1,7 +1,7 @@
 class AddressComponent {
   String? longName;
   String? shortName;
-  List<String>? types;
+  List<dynamic>? types;
 
   AddressComponent({this.longName, this.shortName, this.types});
 
@@ -9,7 +9,7 @@ class AddressComponent {
     return AddressComponent(
       longName: json['long_name'] as String?,
       shortName: json['short_name'] as String?,
-      types: json['types'] as List<String>?,
+      types: json['types'] as List<dynamic>?,
     );
   }
 

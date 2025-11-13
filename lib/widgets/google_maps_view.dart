@@ -77,7 +77,15 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
             spacing: 10,
             children: [
               CustomTextField(textEditingController: textEditingController),
-              CustomListView(places: places),
+              CustomListView(
+                places: places,
+                googleMapsPlacesService: googleMapsPlacesService,
+                onPlaceSelect: (placeDetailsModel) {
+                  textEditingController.clear();
+                  places.clear();
+                  setState(() {});
+                },
+              ),
             ],
           ),
         ),
