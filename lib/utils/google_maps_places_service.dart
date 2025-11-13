@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:route_tracker/models/place_autocomplete_model/place_autocomplete_model.dart';
+import 'package:route_tracker/models/place_details_model/place_details_model.dart';
 
 class GoogleMapsPlacesService {
   final String baseUrl = 'https://maps.googleapis.com/maps/api/place';
@@ -22,6 +23,20 @@ class GoogleMapsPlacesService {
       return places;
     } else {
       throw Exception('Failed to load predictions');
+    }
+  }
+
+  Future<PlaceDetailsModel> getPlcaceDetails({required String placeID}) async {
+    var response = await http.get(
+      Uri.parse('$baseUrl/details/json?key=$apiKey&place_id=$placeID'),
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body)['result'];
+      var result = PlaceDetailsModel.fromJson(data);
+      return result;
+    } else {
+      throw Exception('Failed to load details');
     }
   }
 }
