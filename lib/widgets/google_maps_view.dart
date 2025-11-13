@@ -5,6 +5,7 @@ import 'package:route_tracker/utils/google_maps_places_service.dart';
 import 'package:route_tracker/utils/location_service.dart';
 import 'package:route_tracker/widgets/custom_list_view.dart';
 import 'package:route_tracker/widgets/custom_text_field.dart';
+import 'package:uuid/uuid.dart';
 
 class GoogleMapsView extends StatefulWidget {
   const GoogleMapsView({super.key});
@@ -19,7 +20,9 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
   late GoogleMapController googleMapController;
   late TextEditingController textEditingController;
   late GoogleMapsPlacesService googleMapsPlacesService;
+  late Uuid uuid;
   List<PlaceAutocompleteModel> places = [];
+  String? sesstionToken;
   Set<Marker> markers = {};
 
   @override
@@ -28,12 +31,14 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
     locationService = LocationService();
     textEditingController = TextEditingController();
     googleMapsPlacesService = GoogleMapsPlacesService();
+    uuid = const Uuid();
     fetchPredection();
     super.initState();
   }
 
   void fetchPredection() {
     textEditingController.addListener(() async {
+      sesstionToken ??= uuid.v4();
       final input = textEditingController.text.trim();
 
       if (input.isEmpty) {
@@ -42,7 +47,10 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
         return;
       }
 
-      var result = await googleMapsPlacesService.getPredictions(input: input);
+      var result = await googleMapsPlacesService.getPredictions(
+        input: input,
+        sessionToken: sesstionToken!,
+      );
       places
         ..clear()
         ..addAll(result);
@@ -83,6 +91,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                 onPlaceSelect: (placeDetailsModel) {
                   textEditingController.clear();
                   places.clear();
+                  sesstionToken = null;
                   setState(() {});
                 },
               ),
