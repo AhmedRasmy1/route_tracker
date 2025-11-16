@@ -28,6 +28,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
   String? sesstionToken;
   Set<Marker> markers = {};
   Set<Polyline> polyLines = {};
+  Timer? debounce;
 
   @override
   void initState() {
@@ -41,6 +42,8 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
 
   void fetchPredection() {
     textEditingController.addListener(() async {
+      if (debounce?.isActive ?? false) debounce!.cancel();
+      debounce = Timer(const Duration(milliseconds: 100), () {});
       sesstionToken ??= uuid.v4();
       final input = textEditingController.text.trim();
 
@@ -62,6 +65,7 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
   @override
   void dispose() {
     textEditingController.dispose();
+    debounce?.cancel();
     super.dispose();
   }
 
