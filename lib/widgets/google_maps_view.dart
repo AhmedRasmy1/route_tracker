@@ -22,7 +22,6 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
   late GoogleMapController googleMapController;
   late TextEditingController textEditingController;
   late Uuid uuid;
-  late LatLng currentLocation;
   late LatLng destinationn;
   List<PlaceAutocompleteModel> places = [];
   String? sesstionToken;
@@ -106,7 +105,6 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
                   );
 
                   var points = await mapServices.getRouteData(
-                    currentLocation: currentLocation,
                     destinationn: destinationn,
                   );
                   mapServices.displayRoute(
@@ -124,11 +122,14 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
     );
   }
 
-  void updateCurrentLocation() async {
+  void updateCurrentLocation() {
     try {
-      currentLocation = await mapServices.updateCurrentLocation(
+      mapServices.updateCurrentLocation(
         googleMapController: googleMapController,
         markers: markers,
+        onUpdateCurrentLocation: () {
+          setState(() {});
+        },
       );
       setState(() {});
     } on LocationPermissionException {
