@@ -5,7 +5,6 @@ import 'package:route_tracker/models/location_info/lat_lng.dart';
 import 'package:route_tracker/models/location_info/location.dart';
 import 'package:route_tracker/models/location_info/location_info.dart';
 import 'package:route_tracker/models/place_autocomplete_model/place_autocomplete_model.dart';
-import 'package:route_tracker/models/routes_model/route.dart';
 import 'package:route_tracker/models/routes_model/routes_model.dart';
 import 'package:route_tracker/utils/google_maps_places_service.dart';
 import 'package:route_tracker/utils/location_service.dart';
@@ -13,6 +12,7 @@ import 'package:route_tracker/utils/routes_service.dart';
 import 'package:route_tracker/widgets/custom_list_view.dart';
 import 'package:route_tracker/widgets/custom_text_field.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:math';
 
 class GoogleMapsView extends StatefulWidget {
   const GoogleMapsView({super.key});
@@ -194,6 +194,28 @@ class _GoogleMapsViewState extends State<GoogleMapsView> {
     );
 
     polyLines.add(routes);
+    LatLngBounds bounds = getLatLngBounds(points);
+    googleMapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 32));
     setState(() {});
+  }
+
+  LatLngBounds getLatLngBounds(List<LatLng> points) {
+    var southwestLatitude = points.first.latitude;
+    var southwestLongitude = points.first.longitude;
+    var northEastLatitude = points.first.latitude;
+    var northEastLongitude = points.first.longitude;
+
+    for (var point in points) {
+      southwestLatitude = min(southwestLatitude, point.latitude);
+      southwestLongitude = min(southwestLongitude, point.longitude);
+
+      northEastLatitude = max(northEastLatitude, point.latitude);
+      northEastLongitude = max(northEastLongitude, point.longitude);
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(southwestLatitude, southwestLongitude),
+      northeast: LatLng(northEastLatitude, northEastLongitude),
+    );
   }
 }
