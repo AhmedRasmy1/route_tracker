@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:route_tracker/models/location_info/location_info.dart';
 import 'package:route_tracker/models/routes_model/routes_model.dart';
 import 'package:http/http.dart' as http;
@@ -8,10 +10,10 @@ class RoutesService {
       "https://routes.googleapis.com/directions/v2:computeRoutes";
   final String apiKey = "AIzaSyBHANZAeJhQt3VAoBm07lT4rh8vJrqsXaA";
   Future<RoutesModel> fetchRoutes({
-    required LocationInfo origin,
-    required LocationInfo destination,
+    required LocationInfoModel origin,
+    required LocationInfoModel destination,
     RoutesModifires? routesModifires,
-  }) {
+  }) async {
     Uri url = Uri.parse(baseUrl);
     Map<String, String> headres = {
       'Content-Type': 'application/json',
@@ -31,5 +33,13 @@ class RoutesService {
       "languageCode": "en-US",
       "units": "METRIC",
     };
+
+    var response = await http.post(url, headers: headres, body: body);
+    if (response.statusCode == 200) {
+      var result = RoutesModel.fromJson(jsonDecode(response.body));
+      return result;
+    } else {
+      throw Exception("No routes found");
+    }
   }
 }
