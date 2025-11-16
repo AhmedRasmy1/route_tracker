@@ -34,7 +34,11 @@ class RoutesService {
       "units": "METRIC",
     };
 
-    var response = await http.post(url, headers: headres, body: body);
+    var response = await http.post(
+      url,
+      headers: headres,
+      body: jsonEncode(body),
+    );
     if (response.statusCode == 200) {
       var result = RoutesModel.fromJson(jsonDecode(response.body));
       return result;
